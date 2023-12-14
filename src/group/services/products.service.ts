@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './../dtos/products.dtos';
 import { ProductoRepositoryImplement } from '../repository/product.repository.imple';
 import { Product } from '../entities/product.entity';
@@ -33,7 +33,7 @@ export class ProductsService {
           return res;
       }catch (err) {
           if (err && err.length > 0) {
-              throw new BadRequestException(err);
+              throw new ConflictException(err);
           } else {
               throw new InternalServerErrorException(err.message);
           }
@@ -49,7 +49,7 @@ export class ProductsService {
         return res;
     }catch (err) {
         if (err && err.length > 0) {
-            throw new BadRequestException(err);
+            throw new ConflictException(err);
         } else {
             throw new InternalServerErrorException(err.message);
         }
@@ -67,7 +67,7 @@ export class ProductsService {
               return res;
          }catch (err) {
              if (err.message.includes("Duplicate entry")) {
-                 throw new BadRequestException(`El Producto: ${product.cod_product.toUpperCase()}-${product.name_product.toUpperCase()} ya se encuentra registrado`);
+                 throw new ConflictException(`El Producto: ${product.cod_product.toUpperCase()}-${product.name_product.toUpperCase()} ya se encuentra registrado`);
              } else {
                  throw new InternalServerErrorException(err.message);
              }

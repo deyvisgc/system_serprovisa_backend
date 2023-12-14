@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { FamilyRepositoryImplement } from '../repository/family.repository.imple';
 import { CreateFamily, UpdateFamily } from '../dtos/family.dtos';
 import { Family } from '../entities/family.entity';
@@ -28,7 +28,7 @@ export class FamilyService {
             return res;
         }catch (err) {
             if (err && err.length > 0) {
-                throw new BadRequestException(err);
+                throw new ConflictException(err);
             } else {
                 throw new InternalServerErrorException(err.message);
             }
@@ -46,7 +46,7 @@ export class FamilyService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                   throw new BadRequestException(`La familia: ${family.codigo_familia.toUpperCase()} - ${family.descripcion_familia.toUpperCase()} ya se encuentra registrada`);
+                   throw new ConflictException(`La familia: ${family.codigo_familia.toUpperCase()} - ${family.descripcion_familia.toUpperCase()} ya se encuentra registrada`);
                } else {
                    throw new InternalServerErrorException(err.message);
                }

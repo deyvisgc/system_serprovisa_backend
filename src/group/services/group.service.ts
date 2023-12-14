@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { GroupRepositoryImplement } from '../repository/group.repository.imple';
 import { Group } from '../entities/group.entity';
 import { CreateGroup, UpdateGroup } from '../dtos/group.dto';
@@ -28,13 +28,14 @@ export class GroupService {
             return res;
         }catch (err) {
             if (err && err.length > 0) {
-                throw new BadRequestException(err);
+                throw new ConflictException(err);
             } else {
                 throw new InternalServerErrorException(err.message);
             }
         }
     }
     async update(id: number, group: UpdateGroup): Promise<Response>  {
+
         let res = new Response()
         const exist = this.findById(id);
         if (exist) {
@@ -46,7 +47,7 @@ export class GroupService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                   throw new BadRequestException(`El Grupo: ${group.cod_gru.toUpperCase()} - ${group.des_gru.toUpperCase()} ya se encuentra registrado`);
+                   throw new ConflictException(`El Grupo: ${group.cod_gru.toUpperCase()} - ${group.des_gru.toUpperCase()} ya se encuentra registrado`);
                } else {
                    throw new InternalServerErrorException(err.message);
                }

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateLinea, UpdateLinea } from 'src/linea/dtos/linea.dtos';
 import { Linea } from 'src/linea/entities/linea';
 import { LineaRepositoryImplement } from 'src/linea/repository/linea.repository.imple';
@@ -36,7 +36,7 @@ export class LineaService {
             return res;
         }catch (err) {
             if (err && err.length > 0) {
-                throw new BadRequestException(err);
+                throw new ConflictException(err);
             } else {
                 throw new InternalServerErrorException(err.message);
             }
@@ -54,7 +54,7 @@ export class LineaService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                   throw new BadRequestException(`La Linea: ${linea.cod_line} - ${linea.des_line} ya se encuentra registrada`);
+                   throw new ConflictException(`La Linea: ${linea.cod_line} - ${linea.des_line} ya se encuentra registrada`);
                } else {
                    throw new InternalServerErrorException(err.message);
                }

@@ -1,4 +1,4 @@
-import {  BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {  ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { AdminRepositoryImplement } from '../repository/admin.repository.imple';
 import { Users } from '../entities/users.entity';
 import { Response } from 'src/response/response';
@@ -72,7 +72,7 @@ export class AdminService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                return new BadRequestException({message: `El email: ${users.email} ya se encuentra registrado`});
+                return new ConflictException({message: `El email: ${users.email} ya se encuentra registrado`});
                } else {
                    throw new InternalServerErrorException("Error", err.message);
                }
