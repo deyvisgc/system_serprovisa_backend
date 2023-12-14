@@ -4,6 +4,6 @@ export enum AppConstants {
     TABLA_FAMILIA='family',
     TABLA_LINEA='linea',
     TABLA_GRUPO='group_produc',
-    TABLA_USERS='user',
-    TABLA_ROLE='ROLE'
+    TABLA_USERS='users',
+    TABLA_ROLE='rol'
   }
