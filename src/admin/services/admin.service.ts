@@ -13,6 +13,7 @@ import { Login } from '../dtos/auth.dtos';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterAdminDto, UpdateAdminDto } from '../dtos/register.dtos';
 import { RoleRepositoryImplement } from '../repository/role.repository.imple';
+import { Permisos } from '../entities/permiso.entity';
 
 @Injectable()
 export class AdminService {
@@ -128,5 +129,8 @@ export class AdminService {
   }
   async findRole() {
     return this.roleService.findAll();
+  }
+  async findPermisos(): Promise<Permisos[]> {
+    return this.adminRepository.getPermisos();
   }
 }

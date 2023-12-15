@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AppConstants } from 'src/util/Constantes.enum';
+import { ConstantsEnum, TableEnum } from 'src/util/Constantes.enum';
 import * as mysql from 'mysql2';
 import { LineaRepositoryInterface } from './linea.repository.interface';
 import { Linea } from '../entities/linea';
@@ -7,10 +7,10 @@ import { CreateLinea, UpdateLinea } from '../dtos/linea.dtos';
 @Injectable()
 export class LineaRepositoryImplement implements LineaRepositoryInterface {
   constructor(
-    @Inject(AppConstants.provideConnection) private connectionDB: mysql.Pool,
+    @Inject(ConstantsEnum.provideConnection) private connectionDB: mysql.Pool,
   ) {}
   findByIdFamilia(id: number): Promise<Linea[]> {
-    const sql = `SELECT * FROM ${AppConstants.TABLA_LINEA} where family_id_fam = ? and status_line = 1`;
+    const sql = `SELECT * FROM ${TableEnum.LINEA} where family_id_fam = ? and status_line = 1`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -23,13 +23,13 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
   }
   findAll(limit: number, offset: number, page: number): Promise<any> {
     offset = (page - 1) * limit;
-    let sql = `SELECT li.*, fa.cod_fam, fa.des_fam FROM ${AppConstants.TABLA_LINEA} as li inner join 
-        ${AppConstants.TABLA_FAMILIA} as fa on li.family_id_fam = fa.id_fam where status_line = 1  order by id_line asc limit ${limit} offset ${offset}`;
+    let sql = `SELECT li.*, fa.cod_fam, fa.des_fam FROM ${TableEnum.LINEA} as li inner join 
+        ${TableEnum.FAMILIA} as fa on li.family_id_fam = fa.id_fam where status_line = 1  order by id_line asc limit ${limit} offset ${offset}`;
     return new Promise(async (resolve, reject) => {
       try {
         const res = await this.connectionDB.query(sql);
-        sql = `SELECT count(*) as count FROM ${AppConstants.TABLA_LINEA} as li inner join 
-                ${AppConstants.TABLA_FAMILIA} as fa on li.family_id_fam = fa.id_fam where status_line = 1`;
+        sql = `SELECT count(*) as count FROM ${TableEnum.LINEA} as li inner join 
+                ${TableEnum.FAMILIA} as fa on li.family_id_fam = fa.id_fam where status_line = 1`;
         const count = await this.connectionDB.query(sql);
         const result = {
           limit,
@@ -44,7 +44,7 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
     });
   }
   findById(id: number): Promise<Linea> {
-    const sql = `SELECT * FROM ${AppConstants.TABLA_LINEA} where id_line = ? and  status_line = 1`;
+    const sql = `SELECT * FROM ${TableEnum.LINEA} where id_line = ? and  status_line = 1`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -56,7 +56,7 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
     });
   }
   async create(linea: CreateLinea[]): Promise<boolean> {
-    const sql = `INSERT INTO ${AppConstants.TABLA_LINEA} (cod_line, des_line, status_line, family_id_fam) VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${TableEnum.LINEA} (cod_line, des_line, status_line, family_id_fam) VALUES (?, ?, ?, ?)`;
     let errors = [];
     return new Promise(async (resolve, reject) => {
       const validateError = await this.validateDuplicados(linea);
@@ -81,7 +81,7 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
     });
   }
   update(id: number, linea: UpdateLinea): Promise<boolean> {
-    const sql = `UPDATE ${AppConstants.TABLA_LINEA} set cod_line = ?, des_line = ?, family_id_fam = ?  WHERE id_line = ?`;
+    const sql = `UPDATE ${TableEnum.LINEA} set cod_line = ?, des_line = ?, family_id_fam = ?  WHERE id_line = ?`;
 
     const values = [linea.cod_line.toUpperCase(), linea.des_line.toUpperCase(), linea.id_familia, id];
     return new Promise(async (resolve, reject) => {
@@ -94,7 +94,7 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
     });
   }
   delete(id: number): Promise<boolean> {
-    const sql = `UPDATE  ${AppConstants.TABLA_LINEA} set status_line = 0 WHERE id_line = ? `;
+    const sql = `UPDATE  ${TableEnum.LINEA} set status_line = 0 WHERE id_line = ? `;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -106,7 +106,7 @@ export class LineaRepositoryImplement implements LineaRepositoryInterface {
     });
   }
   async validateDuplicados(family: CreateLinea[]) {
-    const sql = `select * from ${AppConstants.TABLA_LINEA} where cod_line = ? limit 1`;
+    const sql = `select * from ${TableEnum.LINEA} where cod_line = ? limit 1`;
     const errors = [];
 
     for (const item of family) {

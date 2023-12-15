@@ -1,9 +1,14 @@
-export enum AppConstants {
+export enum ConstantsEnum {
     provideConnection = 'CONNECTION',
-    TABLA_PRODUCTO='products',
-    TABLA_FAMILIA='family',
-    TABLA_LINEA='linea',
-    TABLA_GRUPO='group_produc',
-    TABLA_USERS='users',
-    TABLA_ROLE='rol'
+  }
+  export enum TableEnum {
+    provideConnection = 'CONNECTION',
+    PRODUCTO='products',
+    FAMILIA='family',
+    LINEA='linea',
+    GRUPO='group_produc',
+    USERS='users',
+    ROLE='rol',
+    PERMISOS='permissions',
+    USERS_PERMISOS='user_permissions'
   }

@@ -2,12 +2,12 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import * as mysql from 'mysql2/promise';
 import config from '../config';
-import { AppConstants } from 'src/util/Constantes.enum';
+import { ConstantsEnum } from 'src/util/Constantes.enum';
 @Global()
 @Module({
     providers: [
         {
-            provide: AppConstants.provideConnection,
+            provide: ConstantsEnum.provideConnection,
             useFactory: (configService: ConfigType<typeof config>) => {
                 
               const { user, host, db_name, password, port } = configService.database;
@@ -29,6 +29,6 @@ import { AppConstants } from 'src/util/Constantes.enum';
             inject: [config.KEY],
           },
     ],
-    exports: [AppConstants.provideConnection ],
+    exports: [ConstantsEnum.provideConnection ],
 })
 export class DatabaseModule {}

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AppConstants } from 'src/util/Constantes.enum';
+import { ConstantsEnum, TableEnum } from 'src/util/Constantes.enum';
 import * as mysql from 'mysql2';
 import { GroupRepositoryInterface } from './group.repository.interface';
 import { Group } from '../entities/group.entity';
@@ -8,7 +8,7 @@ import * as mysql2 from 'mysql2/promise';
 @Injectable()
 export class GroupRepositoryImplement implements GroupRepositoryInterface {
   constructor(
-    @Inject(AppConstants.provideConnection) private connectionDB: mysql.Pool,
+    @Inject(ConstantsEnum.provideConnection) private connectionDB: mysql.Pool,
   ) {}
   findAll(
     limit: number,
@@ -20,10 +20,10 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     linea: number,
   ): Promise<any> {
     offset = (page - 1) * limit;
-    let query = `SELECT gru.*, fa.cod_fam, fa.des_fam, li.cod_line, li.des_line FROM ${AppConstants.TABLA_GRUPO} as gru inner join ${AppConstants.TABLA_LINEA} as li on gru.linea_id_line = li.id_line 
-                    inner join ${AppConstants.TABLA_FAMILIA} as fa on gru.fam_id_familia = fa.id_fam where status_gru = 1`;
-    let queryCount = `SELECT count(*) as count FROM ${AppConstants.TABLA_GRUPO} as gru inner join ${AppConstants.TABLA_LINEA} as li on gru.linea_id_line = li.id_line 
-                    inner join ${AppConstants.TABLA_FAMILIA} as fa on gru.fam_id_familia = fa.id_fam where status_gru = 1`;
+    let query = `SELECT gru.*, fa.cod_fam, fa.des_fam, li.cod_line, li.des_line FROM ${TableEnum.GRUPO} as gru inner join ${TableEnum.LINEA} as li on gru.linea_id_line = li.id_line 
+                    inner join ${TableEnum.FAMILIA} as fa on gru.fam_id_familia = fa.id_fam where status_gru = 1`;
+    let queryCount = `SELECT count(*) as count FROM ${TableEnum.GRUPO} as gru inner join ${TableEnum.LINEA} as li on gru.linea_id_line = li.id_line 
+                    inner join ${TableEnum.FAMILIA} as fa on gru.fam_id_familia = fa.id_fam where status_gru = 1`;
     return new Promise(async (resolve, reject) => {
       try {
         if (fech_ini && fech_fin) {
@@ -60,7 +60,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   findById(id: number): Promise<Group> {
-    const sql = `SELECT * FROM ${AppConstants.TABLA_GRUPO} where id_grou = ? and status_gru = 1`;
+    const sql = `SELECT * FROM ${TableEnum.GRUPO} where id_grou = ? and status_gru = 1`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -72,7 +72,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   async create(group: CreateGroup[]): Promise<boolean> {
-    const query = `INSERT INTO ${AppConstants.TABLA_GRUPO} (cod_gru, des_gru, status_gru, linea_id_line, fec_regis, fam_id_familia, cod_gru_final) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO ${TableEnum.GRUPO} (cod_gru, des_gru, status_gru, linea_id_line, fec_regis, fam_id_familia, cod_gru_final) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     let errors = [];
     return new Promise(async (resolve, reject) => {
       const validateError = await this.validateDuplicados(group);
@@ -109,7 +109,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   update(id: number, group: UpdateGroup): Promise<boolean> {
-    const sql = `UPDATE ${AppConstants.TABLA_GRUPO} set cod_gru = ?, des_gru = ?, linea_id_line = ? WHERE id_grou = ?`;
+    const sql = `UPDATE ${TableEnum.GRUPO} set cod_gru = ?, des_gru = ?, linea_id_line = ? WHERE id_grou = ?`;
 
     const values = [group.cod_gru.toUpperCase(), group.des_gru.toUpperCase(), group.id_linea, id];
     return new Promise(async (resolve, reject) => {
@@ -123,7 +123,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
   }
   delete(id: number): Promise<boolean> {
     console.log(id);
-    const sql = `UPDATE ${AppConstants.TABLA_GRUPO} set status_gru = 0 WHERE id_grou = ?`;
+    const sql = `UPDATE ${TableEnum.GRUPO} set status_gru = 0 WHERE id_grou = ?`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -135,7 +135,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   findByIdLinea(id: number): Promise<Group[]> {
-    const sql = `SELECT * FROM ${AppConstants.TABLA_GRUPO} where linea_id_line = ? and status_gru = 1`;
+    const sql = `SELECT * FROM ${TableEnum.GRUPO} where linea_id_line = ? and status_gru = 1`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -147,7 +147,7 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   async validateDuplicados(family: CreateGroup[]) {
-    const sql = `select * from ${AppConstants.TABLA_GRUPO} where cod_gru = ? limit 1`;
+    const sql = `select * from ${TableEnum.GRUPO} where cod_gru = ? limit 1`;
     const errors = [];
 
     for (const item of family) {

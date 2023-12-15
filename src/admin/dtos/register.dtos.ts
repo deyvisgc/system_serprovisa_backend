@@ -14,6 +14,8 @@ export class RegisterAdminDto {
     name: string;
     @IsNotEmpty()
     id_rol: number;
+    @IsNotEmpty()
+    modulo: any[]
   }
 export class UpdateAdminDto extends PartialType(RegisterAdminDto) {
 }

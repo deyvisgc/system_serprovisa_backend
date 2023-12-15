@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { AppConstants } from "src/util/Constantes.enum";
+import { ConstantsEnum, TableEnum } from "src/util/Constantes.enum";
 import { ProductoRepositoryInterface } from "./product.repository.interface";
 import { CreateProductDto, UpdateProductDto } from "../dtos/products.dtos";
 import { Product } from "../entities/product.entity";
@@ -7,14 +7,14 @@ import * as mysql2 from 'mysql2/promise';
 import * as mysql from 'mysql2';
 @Injectable()
 export class ProductoRepositoryImplement implements ProductoRepositoryInterface {
-    constructor( @Inject(AppConstants.provideConnection) private connectionDB: mysql.Pool) {}
+    constructor( @Inject(ConstantsEnum.provideConnection) private connectionDB: mysql.Pool) {}
     findReport(): Promise<any[]> {
         const sql = `SELECT
                 MONTH(fech_regis) AS mes,
                 YEAR(fech_regis) AS year,
                 COUNT(*) AS total_productos
             FROM
-                products
+            ${TableEnum.PRODUCTO}
             WHERE
                 status_product = 1
             GROUP BY
@@ -36,9 +36,9 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
                     us.us_full_name,
                     COUNT(p.id_prod) AS cantidad_productos
                 FROM
-                    ${AppConstants.TABLA_USERS} AS us
+                    ${TableEnum.USERS} AS us
                 INNER JOIN
-                ${AppConstants.TABLA_PRODUCTO} AS p ON us.id_user = p.user_id_user where status_product = 1
+                ${TableEnum.PRODUCTO} AS p ON us.id_user = p.user_id_user where status_product = 1
                 GROUP BY
                     us.id_user
                 ORDER BY
@@ -58,20 +58,20 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
         offset = (page - 1) * limit;
         
         let query = `SELECT pr.*, gr.cod_gru, gr.des_gru, us.us_full_name, fa.cod_fam, fa.des_fam, li.cod_line, li.des_line
-        FROM ${AppConstants.TABLA_PRODUCTO} as pr inner join ${AppConstants.TABLA_GRUPO} 
+        FROM ${TableEnum.PRODUCTO} as pr inner join ${TableEnum.GRUPO} 
         as gr on pr.group_id_group = gr.id_grou 
-        inner join ${AppConstants.TABLA_USERS}  as us
+        inner join ${TableEnum.USERS}  as us
         on pr.user_id_user = us.id_user
-        inner join ${AppConstants.TABLA_FAMILIA} as fa on gr.fam_id_familia = fa.id_fam
-        inner join ${AppConstants.TABLA_LINEA} as li on gr.linea_id_line = li.id_line
+        inner join ${TableEnum.FAMILIA} as fa on gr.fam_id_familia = fa.id_fam
+        inner join ${TableEnum.LINEA} as li on gr.linea_id_line = li.id_line
          where pr.status_product = 1`
          
-        let queryCount = `SELECT count(*) as count FROM ${AppConstants.TABLA_PRODUCTO} as pr inner join ${AppConstants.TABLA_GRUPO} 
+        let queryCount = `SELECT count(*) as count FROM ${TableEnum.PRODUCTO} as pr inner join ${TableEnum.GRUPO} 
         as gr on pr.group_id_group = gr.id_grou 
-        inner join ${AppConstants.TABLA_USERS}  as us
+        inner join ${TableEnum.USERS}  as us
         on pr.user_id_user = us.id_user
-        inner join ${AppConstants.TABLA_FAMILIA} as fa on gr.fam_id_familia = fa.id_fam
-        inner join ${AppConstants.TABLA_LINEA} as li on gr.linea_id_line = li.id_line
+        inner join ${TableEnum.FAMILIA} as fa on gr.fam_id_familia = fa.id_fam
+        inner join ${TableEnum.LINEA} as li on gr.linea_id_line = li.id_line
          where pr.status_product = 1`
 
                     
@@ -114,7 +114,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
         });
     }
     findById(id: number): Promise<Product> {
-        const sql = `SELECT * FROM ${AppConstants.TABLA_PRODUCTO} where id_prod = ? and status_product = 1`;
+        const sql = `SELECT * FROM ${TableEnum.PRODUCTO} where id_prod = ? and status_product = 1`;
         const values = [id];
         return new Promise(async (resolve, reject) => {
           try {
@@ -126,7 +126,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
         });
     }
     create(product: CreateProductDto[]): Promise<boolean> {
-        let query = `INSERT INTO ${AppConstants.TABLA_PRODUCTO} (cod_product, name_product, des_product, status_product, group_id_group, user_id_user, fech_regis) VALUES (?, ?, ?, ?, ?, ?, ?)` ;
+        let query = `INSERT INTO ${TableEnum.PRODUCTO} (cod_product, name_product, des_product, status_product, group_id_group, user_id_user, fech_regis) VALUES (?, ?, ?, ?, ?, ?, ?)` ;
         let errors = []
         return new Promise(async (resolve, reject) => {
             for (const p of product) {
@@ -146,7 +146,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
             if (errors.length > 0) {
                 reject(errors)
             } else {
-                query = `SELECT count(*) as totalProducto FROM ${AppConstants.TABLA_PRODUCTO} where group_id_group = ? and cod_product LIKE ?`;
+                query = `SELECT count(*) as totalProducto FROM ${TableEnum.PRODUCTO} where group_id_group = ? and cod_product LIKE ?`;
                
                 const codigoSinNumeros = product[0].cod_product.split("-")
 
@@ -154,7 +154,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
                 try {
                     const totalProducto = await this.connectionDB.query(query, values);
                     if (totalProducto && totalProducto[0].length > 0) {
-                        query = `UPDATE ${AppConstants.TABLA_GRUPO} set total_product = ? WHERE id_grou = ?` ;
+                        query = `UPDATE ${TableEnum.GRUPO} set total_product = ? WHERE id_grou = ?` ;
                         values = [totalProducto[0][0].totalProducto, product[0].id_grupo]
                         await this.connectionDB.query(query, values);
                     }
@@ -171,7 +171,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
         });
     }
     createMasivo(product: CreateProductDto[]): Promise<boolean> {
-        const queryInsert = `INSERT INTO ${AppConstants.TABLA_PRODUCTO} (cod_product, name_product, des_product, status_product, group_id_group, user_id_user, fech_regis) VALUES (?, ?, ?, ?, ?, ?, ?)` ;
+        const queryInsert = `INSERT INTO ${TableEnum.PRODUCTO} (cod_product, name_product, des_product, status_product, group_id_group, user_id_user, fech_regis) VALUES (?, ?, ?, ?, ?, ?, ?)` ;
         let errors = []
         return new Promise(async (resolve, reject) => {
             for (const p of product) {
@@ -181,7 +181,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
             
                     await this.connectionDB.query(queryInsert, valuesInsert);
                     
-                    const querySelect = `SELECT count(*) as totalProducto FROM ${AppConstants.TABLA_PRODUCTO} where group_id_group = ? and cod_product LIKE ?`;
+                    const querySelect = `SELECT count(*) as totalProducto FROM ${TableEnum.PRODUCTO} where group_id_group = ? and cod_product LIKE ?`;
                     
                     const codigoSinNumeros = p.cod_product.split("-")
                 
@@ -190,7 +190,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
                     const totalProducto = await this.connectionDB.query(querySelect, valuesSelect);
 
                     if (totalProducto && totalProducto[0].length > 0) {
-                        const queryUpdate = `UPDATE ${AppConstants.TABLA_GRUPO} set total_product = ? WHERE id_grou = ?` ;
+                        const queryUpdate = `UPDATE ${TableEnum.GRUPO} set total_product = ? WHERE id_grou = ?` ;
                         const valuesUpdate = [totalProducto[0][0].totalProducto, p.id_grupo]
                         await this.connectionDB.query(queryUpdate, valuesUpdate);
                     }
@@ -216,7 +216,7 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
     }
     update(id: number, product: UpdateProductDto): Promise<boolean> {
 
-        const sql = `UPDATE ${AppConstants.TABLA_PRODUCTO} set name_product = ?, des_product = ? WHERE id_prod = ?`;
+        const sql = `UPDATE ${TableEnum.PRODUCTO} set name_product = ?, des_product = ? WHERE id_prod = ?`;
         const values = [product.name_product.toUpperCase(), product.des_product.toUpperCase(), id];
         return new Promise(async (resolve, reject) => {
         try {

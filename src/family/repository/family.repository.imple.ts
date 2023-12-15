@@ -2,20 +2,20 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FamilyRepositoryInterface } from './family.repository.interface';
 import { CreateFamily, UpdateFamily } from '../dtos/family.dtos';
 import { Family } from '../entities/family.entity';
-import { AppConstants } from 'src/util/Constantes.enum';
+import { ConstantsEnum, TableEnum } from 'src/util/Constantes.enum';
 import * as mysql from 'mysql2';
 @Injectable()
 export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
   constructor(
-    @Inject(AppConstants.provideConnection) private connectionDB: mysql.Pool,
+    @Inject(ConstantsEnum.provideConnection) private connectionDB: mysql.Pool,
   ) {}
   findAll(limit: number, offset: number, page: number): Promise<any> {
     offset = (page - 1) * limit;
-    let sql = `SELECT * FROM ${AppConstants.TABLA_FAMILIA} where status_fam = 1 order by id_fam asc limit ${limit} offset ${offset}`;
+    let sql = `SELECT * FROM ${TableEnum.FAMILIA} where status_fam = 1 order by id_fam asc limit ${limit} offset ${offset}`;
     return new Promise(async (resolve, reject) => {
       try {
         const res = await this.connectionDB.query(sql);
-        sql = `SELECT count(*) as count FROM ${AppConstants.TABLA_FAMILIA} where status_fam = 1`;
+        sql = `SELECT count(*) as count FROM ${TableEnum.FAMILIA} where status_fam = 1`;
         const count = await this.connectionDB.query(sql);
         const result = {
           limit,
@@ -30,7 +30,7 @@ export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
     });
   }
   findById(id: number): Promise<Family> {
-    const sql = `SELECT * FROM ${AppConstants.TABLA_FAMILIA} where id_fam = ? and status_fam = 1`;
+    const sql = `SELECT * FROM ${TableEnum.FAMILIA} where id_fam = ? and status_fam = 1`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -42,7 +42,7 @@ export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
     });
   }
   async create(family: CreateFamily[]): Promise<boolean> {
-    const sql = `INSERT INTO ${AppConstants.TABLA_FAMILIA} (cod_fam, des_fam, status_fam) VALUES (?, ?, ?)`;
+    const sql = `INSERT INTO ${TableEnum.FAMILIA} (cod_fam, des_fam, status_fam) VALUES (?, ?, ?)`;
     let errors = [];
     return new Promise(async (resolve, reject) => {
       const validateError = await this.validateDuplicados(family);
@@ -66,7 +66,7 @@ export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
     });
   }
   update(id: number, family: UpdateFamily): Promise<boolean> {
-    const sql = `UPDATE ${AppConstants.TABLA_FAMILIA} set cod_fam = ?, des_fam = ? WHERE id_fam = ?`;
+    const sql = `UPDATE ${TableEnum.FAMILIA} set cod_fam = ?, des_fam = ? WHERE id_fam = ?`;
     const values = [family.codigo_familia.toUpperCase(), family.descripcion_familia.toUpperCase(), id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -78,7 +78,7 @@ export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
     });
   }
   delete(id: number): Promise<boolean> {
-    const sql = `UPDATE ${AppConstants.TABLA_FAMILIA} set status_fam = 0 WHERE id_fam = ?`;
+    const sql = `UPDATE ${TableEnum.FAMILIA} set status_fam = 0 WHERE id_fam = ?`;
     const values = [id];
     return new Promise(async (resolve, reject) => {
       try {
@@ -90,7 +90,7 @@ export class FamilyRepositoryImplement implements FamilyRepositoryInterface {
     });
   }
   async validateDuplicados(family: CreateFamily[]) {
-    const sql = `select * from ${AppConstants.TABLA_FAMILIA} where cod_fam = ? limit 1`;
+    const sql = `select * from ${TableEnum.FAMILIA} where cod_fam = ? limit 1`;
     const errors = [];
 
     for (const item of family) {

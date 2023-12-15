@@ -7,14 +7,6 @@ import { RegisterAdminDto, UpdateAdminDto } from '../dtos/register.dtos';
 @Controller('api/v1/admin')
 export class AdminController {
     constructor(private adminService: AdminService) {}
-    @Get("prueba")
-    getPrueba(
-      @Query('limit') limit = 10,
-      @Query('offset') offset = 0,
-      @Query("page") page = 1
-    ) {
-      return this.adminService.findAll(limit, offset, page);
-    }
     @UseGuards(JwtAuthGuard)
     @Get()
     getAll(
@@ -23,6 +15,12 @@ export class AdminController {
       @Query("page") page = 1
     ) {
       return this.adminService.findAll(limit, offset, page);
+    }
+    @UseGuards(JwtAuthGuard)
+    @Get("permisos")
+    getPermisos(
+    ) {
+      return this.adminService.findPermisos();
     }
     @UseGuards(JwtAuthGuard)
     @Get("count-total")
