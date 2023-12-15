@@ -22,7 +22,9 @@ export class AdminRepositoryImplement implements AdminRepositoryInterface {
     }
     findAll(limit: number, offset: number, page: number): Promise<any> {
         offset = (page - 1) * limit;
-        let sql = `SELECT us.id_user, us.us_username, us.us_full_name, us.us_fec_regis, ro.ro_name FROM ${AppConstants.TABLA_USERS} as us inner join ${AppConstants.TABLA_ROLE} as ro on us.role_idrole = ro.id_role
+        let sql = `SELECT us.id_user, us.us_username, us.us_full_name, us.us_fec_regis, ro.ro_name FROM ${AppConstants.TABLA_USERS} 
+        as us inner join ${AppConstants.TABLA_ROLE} as ro on us.role_idrole = ro.id_role
+        and ro.ro_name <> "Super Admin"
         order by id_user desc limit ${limit} offset ${offset}`
         return new Promise(async (resolve, reject) => {
             try {

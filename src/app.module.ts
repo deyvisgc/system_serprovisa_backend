@@ -10,6 +10,10 @@ import { enviroments } from './enviroments';
 import { AdminModule } from './admin/admin.module';
 import config from './config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { CommonModule } from './common/common.module';
+console.log(join(__dirname, '..', 'public'))
 @Module({
   imports: [
     FamilyModule,
@@ -20,8 +24,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       load: [config],
       isGlobal: true
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..'), // Ajusta la ruta según tu estructura de carpetas
+      renderPath: "public",
+    }),
     DatabaseModule,
-    AdminModule
+    AdminModule,
+    CommonModule
   ],
   controllers: [AppController],
   providers: [AppService,  {
