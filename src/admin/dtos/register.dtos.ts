@@ -4,7 +4,6 @@ export class RegisterAdminDto {
     @IsEmail()
     @IsNotEmpty()
     email: string;
-
     @IsNotEmpty()
     @MinLength(6)
     @MaxLength(20)

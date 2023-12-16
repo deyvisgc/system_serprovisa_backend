@@ -95,9 +95,10 @@ export class AdminService {
         return res;
       } catch (err) {
         if (err.message.includes('Duplicate entry')) {
-          return new ConflictException({
-            message: `El email: ${users.email} ya se encuentra registrado`,
-          });
+          throw new ConflictException(
+            'Error',
+            `Email ${users.email} ya existe`,
+          );
         } else {
           throw new InternalServerErrorException('Error', err.message);
         }

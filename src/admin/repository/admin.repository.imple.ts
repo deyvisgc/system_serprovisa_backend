@@ -40,12 +40,12 @@ export class AdminRepositoryImplement implements AdminRepositoryInterface {
         offset = (page - 1) * limit;
         let sql = `SELECT us.id_user, us.us_username, us.us_full_name, us.us_fec_regis, ro.ro_name FROM ${TableEnum.USERS} 
         as us inner join ${TableEnum.ROLE} as ro on us.role_idrole = ro.id_role
-        and ro.ro_name <> "Super Admin"
+        where ro.ro_name <> "Super Admin"
         order by id_user desc limit ${limit} offset ${offset}`
         return new Promise(async (resolve, reject) => {
             try {
                 const res = await this.connectionDB.query(sql);
-                sql = `SELECT count(*) as count FROM ${TableEnum.USERS} as us inner join ${TableEnum.ROLE} as ro on us.role_idrole = ro.id_role`
+                sql = `SELECT count(*) as count FROM ${TableEnum.USERS} as us inner join ${TableEnum.ROLE} as ro on us.role_idrole = ro.id_role where ro.ro_name <> "Super Admin"`
                 const count = await this.connectionDB.query(sql);
                 const result = {
                     limit: +limit,
@@ -59,13 +59,19 @@ export class AdminRepositoryImplement implements AdminRepositoryInterface {
             }
         });
     }
-    findById(id: number): Promise<Users> {
+    findById(id: number): Promise<any> {
         const sql = `SELECT id_user, us_username, us_full_name, role_idrole  FROM ${TableEnum.USERS}  where id_user = ?` ;
         const values = [id];
         return new Promise(async (resolve, reject) => {
             try {
-                const res = await this.connectionDB.query(sql, values);
-                resolve(res[0][0] as Users);
+                const users = await this.connectionDB.query(sql, values);
+                const sqlPermisos = `SELECT *  FROM ${TableEnum.USERS_PERMISOS}  where user_id = ?` ;
+                const permisos = await this.connectionDB.query(sqlPermisos, values);
+                const response  = {
+                    users: users[0][0] as Users,
+                    permisos: permisos[0]
+                }
+                resolve(response);
               } catch (error) {
                 reject(error);
             }
@@ -80,11 +86,12 @@ export class AdminRepositoryImplement implements AdminRepositoryInterface {
                 const values = [user.email, user.password, user.name, user.id_rol, new Date()];
                 const result = await this.connectionDB.query(sql, values);
                 for (const mo of user.modulo) {
-                    console.log(mo)
                     for(const per of mo.permisos) {
-                        const sqlInsertPermiso = `INSERT INTO ${TableEnum.USERS_PERMISOS} (user_id, permission_id, modulo) VALUES (?, ?, ?)` ;
-                        const valuesPermiso  = [result[0].insertId, per, mo.id]
-                        await this.connectionDB.query(sqlInsertPermiso, valuesPermiso);
+                        if (per.checked) {
+                            const sqlInsertPermiso = `INSERT INTO ${TableEnum.USERS_PERMISOS} (user_id, permission_id, modulo) VALUES (?, ?, ?)` ;
+                            const valuesPermiso  = [result[0].insertId, per.id_permission, mo.id]
+                            await this.connectionDB.query(sqlInsertPermiso, valuesPermiso);
+                        }
                     }
                 }
                 resolve(true)
@@ -98,7 +105,22 @@ export class AdminRepositoryImplement implements AdminRepositoryInterface {
         const values = [user.email, user.name, user.id_rol, id];
         return new Promise(async (resolve, reject) => {
             try {
+                
                 await this.connectionDB.query(sql, values);
+                
+                const sqlDelete = `DELETE FROM ${TableEnum.USERS_PERMISOS} where user_id = ?` ;
+                
+                await this.connectionDB.query(sqlDelete, [id]);
+
+                for (const mo of user.modulo) {
+                    for(const per of mo.permisos) {
+                        if (per.checked) {
+                            const sqlInsertPermiso = `INSERT INTO ${TableEnum.USERS_PERMISOS} (user_id, permission_id, modulo) VALUES (?, ?, ?)` ;
+                            const valuesPermiso  = [id, per.id_permission, mo.id]
+                            await this.connectionDB.query(sqlInsertPermiso, valuesPermiso);
+                        }
+                    }
+                }
                 resolve(true)
               } catch (error) {
                 reject(error)
