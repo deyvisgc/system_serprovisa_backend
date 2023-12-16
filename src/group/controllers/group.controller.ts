@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, Res, UseGuards } from '@nestjs/common';
 import { GroupService } from '../services/group.service';
 import { CreateGroup, UpdateGroup } from '../dtos/group.dto';
 import { JwtAuthGuard } from 'src/admin/auth.guard';
-
+import { Response } from 'express';
 @Controller('api/v1/group')
 export class GroupController {
     constructor(private groupService: GroupService) {}
@@ -20,6 +20,22 @@ export class GroupController {
       const fam = familia !== "" ? parseInt(familia, 10) : 0
       const lin = linea !== "" ? parseInt(linea, 10) : 0
       return this.groupService.findAll(limit, offset, page, fecha_ini, fecha_fin, fam, lin);
+    }
+    @UseGuards(JwtAuthGuard)
+    @Get("export/excel")
+    async exportExcel(
+      @Res() res: Response,
+      @Query("fecha_ini") fecha_ini = "",
+      @Query("fecha_fin") fecha_fin = "",
+      @Query("familia") familia = "",
+      @Query("linea") linea = "",
+    ) {
+      const fam = familia !== "" ? parseInt(familia, 10) : 0
+      const lin = linea !== "" ? parseInt(linea, 10) : 0
+      const buffer = await this.groupService.exportarExcel(fecha_ini, fecha_fin, fam, lin);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=nombre-del-archivo.xlsx');
+      res.send(buffer);
     }
     @UseGuards(JwtAuthGuard)
     @Get(':id')

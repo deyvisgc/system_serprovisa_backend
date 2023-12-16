@@ -27,6 +27,9 @@ export class ProductsController {
     const users = user !== "" ? parseInt(user, 10) : 0
     return this.productsService.findAll(limit, offset, page, fecha_ini, fecha_fin, fam, lin, group, users);
   }
+  
+
+
   @UseGuards(JwtAuthGuard)
   @Get('lastProducts')
   @HttpCode(HttpStatus.ACCEPTED)

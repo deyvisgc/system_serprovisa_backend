@@ -25,7 +25,6 @@ export class ImportarService {
     worksheet.columns.forEach((column) => {
       column.width = 30;
     });
-
     data.forEach((row) => {
       worksheet.addRow(row);
     });

@@ -3,10 +3,12 @@ import { GroupRepositoryImplement } from '../repository/group.repository.imple';
 import { Group } from '../entities/group.entity';
 import { CreateGroup, UpdateGroup } from '../dtos/group.dto';
 import { Response } from 'src/response/response';
+import { ImportarService } from 'src/common/importar/importar.service';
+
 
 @Injectable()
 export class GroupService {
-    constructor(private groupRepository: GroupRepositoryImplement) {}
+    constructor(private groupRepository: GroupRepositoryImplement, private importarService: ImportarService) {}
     findAll(limit: number, offset: number, page: number, fech_ini: string, fech_fin: string, familia: number, linea: number): Promise<Group[]> {
         return this.groupRepository.findAll(limit, offset, page, fech_ini, fech_fin, familia, linea)
     }
@@ -75,6 +77,17 @@ export class GroupService {
             throw new NotFoundException('Error', "No existe grupos por esa linea no existe");
         }
         return linea
+    }
+    async exportarExcel(fech_ini: string, fech_fin: string, familia: number, linea: number)  {
+        const sheetName = 'Grupo';
+        const columnHeaders = ['Codigo Grupo', 'Descripción Grupo', 'Familia', 'Linea', 'Codigo en Conjunto', 'Total Productos', 'Fecha Registro'];
+        const data = await this.groupRepository.findAll(100000, 0, 1, fech_ini, fech_fin,familia, linea)
+        const listGrupo = []
+        data.registros.forEach((row) => {
+          const ro = [row.cod_gru, row.des_gru, `${row.cod_fam}-${row.des_fam}`, `${row.cod_line}-${row.des_line}`, row.cod_gru_final, row.total_product, row.fec_regis];
+          listGrupo.push(ro)
+        });
+        return await this.importarService.exportarExcel(sheetName, columnHeaders, listGrupo)
     }
     
 }
