@@ -66,11 +66,9 @@ export class AdminService {
   async login(login: Login): Promise<any> {
     const { email, password } = login;
     const userExist = await this.adminRepository.findByEmail(email);
-    if (!userExist)
-      throw new NotFoundException('Error', `El email ${email} no existe`);
+    if (!userExist) throw new NotFoundException('Error', `El email ${email} no existe`);
     const isCheck = await compareHash(password, userExist.us_password);
-    if (!isCheck)
-      new UnauthorizedException({ message: `La contraseña es incorrecta` });
+    if (!isCheck) throw new ConflictException('Error', `La contraseña es incorrecta`);
     const role = await this.roleService.findAll()
     const payload = {
       role: userExist.role_idrole,
@@ -134,4 +132,8 @@ export class AdminService {
   async findPermisos(): Promise<Permisos[]> {
     return this.adminRepository.getPermisos();
   }
+  async findPermisosUsers(id:number): Promise<Permisos[]> {
+    return this.adminRepository.getPermisosUsers(id);
+  }
+  
 }

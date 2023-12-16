@@ -14,14 +14,14 @@ export class LineaService {
     async findById(id: number): Promise<Linea> {
         const linea = await this.lineaRepository.findById(id);
         if (!linea) {
-            throw new NotFoundException("La Linea no existe");
+            throw new NotFoundException('Error', "La Linea no existe");
         }
         return linea
     }
     async findByIdFamilia(id: number): Promise<Linea[]> {
         const linea = await this.lineaRepository.findByIdFamilia(id);
         if (!linea) {
-            throw new NotFoundException("La familia no existe");
+            throw new NotFoundException('Error', "La familia no existe");
         }
         return linea
     }
@@ -36,9 +36,9 @@ export class LineaService {
             return res;
         }catch (err) {
             if (err && err.length > 0) {
-                throw new ConflictException(err);
+                throw new ConflictException( err);
             } else {
-                throw new InternalServerErrorException(err.message);
+                throw new InternalServerErrorException('Error', err.message);
             }
         }
     }
@@ -54,13 +54,13 @@ export class LineaService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                   throw new ConflictException(`La Linea: ${linea.cod_line} - ${linea.des_line} ya se encuentra registrada`);
+                   throw new ConflictException('Error', `La Linea: ${linea.cod_line} - ${linea.des_line} ya se encuentra registrada`);
                } else {
-                   throw new InternalServerErrorException(err.message);
+                   throw new InternalServerErrorException('Error', err.message);
                }
            }
         } else {
-            throw new NotFoundException("La Linea no existe");;
+            throw new NotFoundException('Error', "La Linea no existe");;
         }
     }
     
@@ -73,7 +73,7 @@ export class LineaService {
             res.status = true
             return res;
        }catch (err) {
-          throw new InternalServerErrorException(err.message);
+          throw new InternalServerErrorException('Error', err.message);
        }
     }
 }

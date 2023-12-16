@@ -163,7 +163,6 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
           errors.push(error);
         }
       } catch (error) {
-        console.error(`Error en la consulta SQL para ${item.cod_gru}`, error);
         const errorObj = {
           mensaje: `Error en la consulta SQL para ${item.cod_gru}`,
         };

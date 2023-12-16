@@ -8,7 +8,6 @@ import { FamilyRepositoryImplement } from '../repository/family.repository.imple
 import { CreateFamily, UpdateFamily } from '../dtos/family.dtos';
 import { Family } from '../entities/family.entity';
 import { Response } from 'src/response/response';
-import * as ExcelJS from 'exceljs';
 import { ImportarService } from 'src/common/importar/importar.service';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class FamilyService {
   async findById(id: number): Promise<Family> {
     const family = await this.familyRepository.findById(id);
     if (!family) {
-      throw new NotFoundException('La Familia no existe');
+      throw new NotFoundException('Error', 'La Familia no existe');
     }
     return family;
   }
@@ -37,7 +36,7 @@ export class FamilyService {
       if (err && err.length > 0) {
         throw new ConflictException(err);
       } else {
-        throw new InternalServerErrorException(err.message);
+        throw new InternalServerErrorException('Error', err.message);
       }
     }
   }
@@ -53,15 +52,15 @@ export class FamilyService {
         return res;
       } catch (err) {
         if (err.message.includes('Duplicate entry')) {
-          throw new ConflictException(
+          throw new ConflictException('Error', 
             `La familia: ${family.codigo_familia.toUpperCase()} - ${family.descripcion_familia.toUpperCase()} ya se encuentra registrada`,
           );
         } else {
-          throw new InternalServerErrorException(err.message);
+          throw new InternalServerErrorException('Error', err.message);
         }
       }
     } else {
-      throw new NotFoundException('La Familia no existe');
+      throw new NotFoundException('Error', 'La Familia no existe');
     }
   }
 
@@ -74,7 +73,7 @@ export class FamilyService {
       res.status = true;
       return res;
     } catch (err) {
-      throw new InternalServerErrorException(err.message);
+      throw new InternalServerErrorException('Error', err.message);
     }
   }
   async exportarExcel() {

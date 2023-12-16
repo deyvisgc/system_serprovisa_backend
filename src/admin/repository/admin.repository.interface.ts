@@ -13,5 +13,5 @@ export interface AdminRepositoryInterface {
     findByEmail(email: string): Promise<Users>;
     getCountDashboard(): Promise<any>;
     getPermisos(): Promise<Permisos[]>;
-    getPermisosUsers(): Promise<UsersPermisos[]>;
+    getPermisosUsers(id: number): Promise<UsersPermisos[]>;
   }

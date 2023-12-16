@@ -18,7 +18,7 @@ export class ProductsService {
   async findById(id: number): Promise<Product> {
       const producto = await this.productRepository.findById(id);
       if (!producto) {
-          throw new NotFoundException("El producto no existe");
+          throw new NotFoundException("Error, El producto no existe");
       }
       return producto
   }
@@ -33,9 +33,9 @@ export class ProductsService {
           return res;
       }catch (err) {
           if (err && err.length > 0) {
-              throw new ConflictException(err);
+            throw new ConflictException(err);
           } else {
-              throw new InternalServerErrorException(err.message);
+            throw new InternalServerErrorException('Error', err.message);
           }
       }
   }
@@ -51,7 +51,7 @@ export class ProductsService {
         if (err && err.length > 0) {
             throw new ConflictException(err);
         } else {
-            throw new InternalServerErrorException(err.message);
+            throw new InternalServerErrorException('Error', err.message);
         }
     }
 }
@@ -67,13 +67,13 @@ export class ProductsService {
               return res;
          }catch (err) {
              if (err.message.includes("Duplicate entry")) {
-                 throw new ConflictException(`El Producto: ${product.cod_product.toUpperCase()}-${product.name_product.toUpperCase()} ya se encuentra registrado`);
+                 throw new ConflictException('Error', `El Producto: ${product.cod_product.toUpperCase()}-${product.name_product.toUpperCase()} ya se encuentra registrado`);
              } else {
                  throw new InternalServerErrorException(err.message);
              }
          }
       } else {
-          throw new NotFoundException("El producto no existe");;
+          throw new NotFoundException('Error', "El producto no existe");;
       }
   }
   
@@ -86,8 +86,7 @@ export class ProductsService {
           res.status = true
           return res;
      }catch (err) {
-         console.log(err)
-        throw new InternalServerErrorException(err.message);
+        throw new InternalServerErrorException('Error',  err.message);
      }
   }
 }

@@ -40,6 +40,11 @@ export class AdminController {
       return this.adminService.findById(id);
     }
     @UseGuards(JwtAuthGuard)
+    @Get("permisos/:id")
+    getPermisosUsers(@Param('id', ParseIntPipe)  id: number) {
+      return this.adminService.findPermisosUsers(id);
+    }
+    @UseGuards(JwtAuthGuard)
     @Post()
      create(@Body() user: RegisterAdminDto) {
       try {

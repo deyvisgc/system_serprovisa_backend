@@ -13,7 +13,7 @@ export class GroupService {
     async findById(id: number): Promise<Group> {
         const grupo = await this.groupRepository.findById(id);
         if (!grupo) {
-            throw new NotFoundException("El grupo no existe");
+            throw new NotFoundException('Error', "El grupo no existe");
         }
         return grupo
     }
@@ -30,7 +30,7 @@ export class GroupService {
             if (err && err.length > 0) {
                 throw new ConflictException(err);
             } else {
-                throw new InternalServerErrorException(err.message);
+                throw new InternalServerErrorException('Error', err.message);
             }
         }
     }
@@ -47,13 +47,13 @@ export class GroupService {
                 return res;
            }catch (err) {
                if (err.message.includes("Duplicate entry")) {
-                   throw new ConflictException(`El Grupo: ${group.cod_gru.toUpperCase()} - ${group.des_gru.toUpperCase()} ya se encuentra registrado`);
+                   throw new ConflictException('Error', `El Grupo: ${group.cod_gru.toUpperCase()} - ${group.des_gru.toUpperCase()} ya se encuentra registrado`);
                } else {
                    throw new InternalServerErrorException(err.message);
                }
            }
         } else {
-            throw new NotFoundException("El grupo no existe");;
+            throw new NotFoundException('Error', "El grupo no existe");;
         }
     }
     
@@ -66,14 +66,13 @@ export class GroupService {
             res.status = true
             return res;
        }catch (err) {
-           console.log(err)
-          throw new InternalServerErrorException(err.message);
+          throw new InternalServerErrorException('Error', err.message);
        }
     }
     async findByIdLinea(id: number): Promise<Group[]> {
         const linea = await this.groupRepository.findByIdLinea(id);
         if (!linea) {
-            throw new NotFoundException("No existe grupos por esa linea no existe");
+            throw new NotFoundException('Error', "No existe grupos por esa linea no existe");
         }
         return linea
     }
