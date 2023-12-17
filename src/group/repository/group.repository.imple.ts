@@ -122,7 +122,6 @@ export class GroupRepositoryImplement implements GroupRepositoryInterface {
     });
   }
   delete(id: number): Promise<boolean> {
-    console.log(id);
     const sql = `UPDATE ${TableEnum.GRUPO} set status_gru = 0 WHERE id_grou = ?`;
     const values = [id];
     return new Promise(async (resolve, reject) => {

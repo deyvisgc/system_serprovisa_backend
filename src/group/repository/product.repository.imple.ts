@@ -132,7 +132,6 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
             for (const p of product) {
                 const values = [p.cod_product.toUpperCase(), p.name_product.toUpperCase(), p.des_product.toUpperCase(), "1", p.id_grupo, p.id_user, new Date()];
                 try {
-                  console.log(values)
                   await this.connectionDB.query(query, values);
                 } catch (error) {
                   if (error.message.includes("Duplicate entry")) {
@@ -196,7 +195,6 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
                     }
 
                 } catch (error) {
-                    console.log(error)
                     if (error.message.includes("Duplicate entry")) {
                         const error = { mensaje: `El Producto: ${p.cod_product.toUpperCase()} - ${p.des_product.toUpperCase()} ya se encuentra registrado`};
                         errors.push(error);
@@ -206,7 +204,6 @@ export class ProductoRepositoryImplement implements ProductoRepositoryInterface 
                     
                 }
             }
-            console.log(errors)
             if (errors.length > 0) {
                 reject(errors)
             } else {

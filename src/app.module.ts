@@ -13,7 +13,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CommonModule } from './common/common.module';
-console.log(join(__dirname, '..', 'public'))
 @Module({
   imports: [
     FamilyModule,

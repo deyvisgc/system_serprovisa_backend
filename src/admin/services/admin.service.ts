@@ -41,7 +41,6 @@ export class AdminService {
     let res = new Response();
     try {
       const { password, ...user } = userBody;
-      console.log(password);
       const userParse = {
         ...user,
         password: await generateHash(password),
@@ -52,13 +51,13 @@ export class AdminService {
       res.status = true;
       return res;
     } catch (err) {
-      console.log(err);
       if (err.message.includes('Duplicate entry')) {
         throw new ConflictException(
           'Error',
           `Email ${userBody.email} ya existe`,
         );
       }
+      console.log(err);
       throw new InternalServerErrorException('Error', err.message);
     }
   }
