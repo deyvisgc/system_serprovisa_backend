@@ -3,9 +3,10 @@ import { CreateProductDto, UpdateProductDto } from './../dtos/products.dtos';
 import { ProductoRepositoryImplement } from '../repository/product.repository.imple';
 import { Product } from '../entities/product.entity';
 import { Response } from 'src/response/response';
+import { ImportarService } from 'src/common/importar/importar.service';
 @Injectable()
 export class ProductsService {
-  constructor(private productRepository: ProductoRepositoryImplement) {}
+  constructor(private productRepository: ProductoRepositoryImplement, private importarService: ImportarService) {}
   findAll(limit: number, offset: number, page: number, fech_ini: string, fech_fin: string, familia: number, linea: number, group:number, users:number): Promise<Product[]> {
       return this.productRepository.findAll(limit, offset, page, fech_ini, fech_fin, familia, linea, group, users)
   }
@@ -88,5 +89,67 @@ export class ProductsService {
      }catch (err) {
         throw new InternalServerErrorException('Error',  err.message);
      }
+  }
+  async exportarExcel( fech_ini: string, fech_fin: string, familia: number, linea: number, group:number, users:number ) {
+    const sheetName = 'Productos';
+    const columnHeaders = [
+      'Familia',
+      'Linea',
+      'Grupo',
+      'Codigo Producto',
+      'Nombre Producto',
+      'Detalle Producto',
+      'Responsable',
+      'Fecha Registro'
+    ];
+    const producto = await this.productRepository.findAll(100000, 0, 1, fech_ini, fech_fin, familia, linea, group, users)
+    const listProducto = [];
+    producto.registros.forEach((row) => {
+      const ro = [
+        `${row.cod_fam}-${row.des_fam}`,
+        `${row.cod_line}-${row.des_line}`,
+        `${row.cod_gru}-${row.des_gru}`,
+        row.cod_product,
+        row.name_product,
+        row.des_product,
+        row.us_full_name,
+        row.fech_regis
+      ];
+      listProducto.push(ro);
+    });
+    return await this.importarService.exportarExcel(
+      sheetName,
+      columnHeaders,
+      listProducto
+    );
+  }
+  async exportarPdf( fech_ini: string, fech_fin: string, familia: number, linea: number, group:number, users:number): Promise<ArrayBuffer> {
+    const columnHeaders = [
+        'Familia',
+        'Linea',
+        'Grupo',
+        'Codigo Producto',
+        'Nombre Producto',
+        'Detalle Producto',
+        'Responsable',
+        'Fecha Registro'
+      ];
+    const producto = await this.productRepository.findAll(100000, 0, 1, fech_ini, fech_fin, familia, linea, group, users)
+    const listProducto = [];
+    producto.registros.forEach((row) => {
+      const fecRegis = new Date(row.fech_regis).toISOString().slice(0, 10);
+      const ro = [
+        `${row.cod_fam}-${row.des_fam}`,
+        `${row.cod_line}-${row.des_line}`,
+        `${row.cod_gru}-${row.des_gru}`,
+        row.cod_product,
+        row.name_product,
+        row.des_product,
+        row.us_full_name,
+        fecRegis
+      ];
+      listProducto.push(ro);
+    });
+    return this.importarService.exportarPdf( listProducto, columnHeaders, 'Reporte de Productos');
   }
 }

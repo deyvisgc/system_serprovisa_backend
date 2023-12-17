@@ -15,29 +15,34 @@ export class FamilyController {
     ) {
       return this.familyService.findAll(limit, offset, page);
     }
-    @Get('export/excel')
-    async exportExcel(@Res() res: Response): Promise<void> {
-      const buffer = await this.familyService.exportarExcel();
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', 'attachment; filename=nombre-del-archivo.xlsx');
-      res.send(buffer);
-    }
-    @Get('export/pdf')
-    async generatePdf(@Res() res: Response): Promise<void> {
-      try {
-        const pdfBuffer = await this.familyService.exportarPdf();
+    // @UseGuards(JwtAuthGuard)
+    // @Get('export/excel')
+    // async exportExcel(@Res() res: Response): Promise<void> {
+
+    //   try {
+    //     const buffer = await this.familyService.exportarExcel();
+    //     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     res.setHeader('Content-Disposition', 'attachment; filename=nombre-del-archivo.xlsx');
+    //     res.send(buffer);
+    //   } catch (error) {
+    //     console.error('Error al generar el PDF:', error);
+    //     res.status(500).send(error);
+    //   }
+    // }
+    // @UseGuards(JwtAuthGuard)
+    // @Get('export/pdf')
+    // async generatePdf(@Res() res: Response): Promise<void> {
+    //   try {
+    //     const pdfBuffer = await this.familyService.exportarPdf();
   
-        // Configuración de encabezados
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=example.pdf');
-        // Envía el PDF como respuesta
-        res.send(Buffer.from(pdfBuffer));
-      } catch (error) {
-        console.error('Error al generar el PDF:', error);
-        // Maneja el error y envía una respuesta adecuada, por ejemplo:
-        res.status(500).send('Error al generar el PDF');
-      }
-    }
+    //     res.setHeader('Content-Type', 'application/pdf');
+    //     res.setHeader('Content-Disposition', 'attachment; filename=example.pdf');
+    //     res.send(Buffer.from(pdfBuffer));
+    //   } catch (error) {
+    //     console.error('Error al generar el PDF:', error);
+    //     res.status(500).send('Error al generar el PDF');
+    //   }
+    // }
     @UseGuards(JwtAuthGuard)
     @Get(':id')
     @HttpCode(HttpStatus.ACCEPTED)

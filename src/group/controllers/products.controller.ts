@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
 import { ProductsService } from 'src/group/services/products.service';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
 import { JwtAuthGuard } from 'src/admin/auth.guard';
+import { Response } from 'express';
 @Controller('api/v1/products')
 export class ProductsController {
 
@@ -27,9 +28,6 @@ export class ProductsController {
     const users = user !== "" ? parseInt(user, 10) : 0
     return this.productsService.findAll(limit, offset, page, fecha_ini, fecha_fin, fam, lin, group, users);
   }
-  
-
-
   @UseGuards(JwtAuthGuard)
   @Get('lastProducts')
   @HttpCode(HttpStatus.ACCEPTED)
@@ -42,7 +40,57 @@ export class ProductsController {
   getReport() {
     return this.productsService.findReport();
   }
-  
+  @UseGuards(JwtAuthGuard)
+    @Get("export/excel")
+    async exportExcel(
+      @Res() res: Response,
+      @Query("fecha_ini") fecha_ini = "",
+      @Query("fecha_fin") fecha_fin = "",
+      @Query("familia") familia = "",
+      @Query("linea") linea = "",
+      @Query("grupo") grupo = "",
+      @Query("user") user = "",
+    ) {
+ 
+      try {
+        const fam = familia !== "" ? parseInt(familia, 10) : 0
+        const lin = linea !== "" ? parseInt(linea, 10) : 0
+        const group = grupo !== "" ? parseInt(grupo, 10) : 0
+        const users = user !== "" ? parseInt(user, 10) : 0
+        const buffer = await this.productsService.exportarExcel(fecha_ini, fecha_fin, fam, lin, group, users);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=nombre-del-archivo.xlsx');
+        res.send(buffer);
+      } catch (error) {
+        console.error('Error al generar el archivo excel:', error);
+        res.status(500).send(error);
+      }
+    }
+    @UseGuards(JwtAuthGuard)
+    @Get('export/pdf')
+    async generatePdf(
+      @Res() res: Response,
+      @Query("fecha_ini") fecha_ini = "",
+      @Query("fecha_fin") fecha_fin = "",
+      @Query("familia") familia = "",
+      @Query("linea") linea = "",
+      @Query("grupo") grupo = "",
+      @Query("user") user = "",
+    ): Promise<void> {
+      try {
+        const fam = familia !== "" ? parseInt(familia, 10) : 0
+        const lin = linea !== "" ? parseInt(linea, 10) : 0
+        const group = grupo !== "" ? parseInt(grupo, 10) : 0
+        const users = user !== "" ? parseInt(user, 10) : 0
+        const buffer = await this.productsService.exportarPdf(fecha_ini, fecha_fin, fam, lin, group, users);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=example.pdf');
+        res.send(Buffer.from(buffer));
+      } catch (error) {
+        console.error('Error al generar el PDF:', error);
+        res.status(500).send(error);
+      }
+    }
   @UseGuards(JwtAuthGuard)
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)

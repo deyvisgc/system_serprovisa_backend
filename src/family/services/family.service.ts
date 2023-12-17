@@ -8,11 +8,10 @@ import { FamilyRepositoryImplement } from '../repository/family.repository.imple
 import { CreateFamily, UpdateFamily } from '../dtos/family.dtos';
 import { Family } from '../entities/family.entity';
 import { Response } from 'src/response/response';
-import { ImportarService } from 'src/common/importar/importar.service';
 
 @Injectable()
 export class FamilyService {
-  constructor(private familyRepository: FamilyRepositoryImplement, private importarService: ImportarService) {}
+  constructor(private familyRepository: FamilyRepositoryImplement) {}
   findAll(limit: number, offset: number, page: number): Promise<Family[]> {
     return this.familyRepository.findAll(limit, offset, page);
   }
@@ -76,27 +75,27 @@ export class FamilyService {
       throw new InternalServerErrorException('Error', err.message);
     }
   }
-  async exportarExcel() {
-    const sheetName = 'familia';
-    const columnHeaders = ['Codigo Familia', 'Descripción Familia'];
-    const data = await this.familyRepository.findAll(100000, 0, 1)
-    const listFamilia = []
-    data.registros.forEach((row) => {
-      const ro = [row.cod_fam, row.des_fam];
-      listFamilia.push(ro)
-    });
-    return this.importarService.exportarExcel(sheetName, columnHeaders, listFamilia)
-  }
-  async exportarPdf(): Promise<ArrayBuffer> {
-    const data = await this.familyRepository.findAll(100000, 0, 1)
-    const listFamilia = []
-    let contador = 0
-    data.registros.forEach((row) => {
-      const ro = [contador++, row.cod_fam, row.des_fam];
-      listFamilia.push(ro)
-    });
-    const columnHeaders = ['N°', 'Codigo Familia', 'Descripción Familia'];
-    return this.importarService.exportarPdf(listFamilia, columnHeaders, "Reporte de Familias de Productos")
-  }
+  // async exportarExcel() {
+  //   const sheetName = 'familia';
+  //   const columnHeaders = ['Codigo Familia', 'Descripción Familia'];
+  //   const data = await this.familyRepository.findAll(100000, 0, 1)
+  //   const listFamilia = []
+  //   data.registros.forEach((row) => {
+  //     const ro = [row.cod_fam, row.des_fam];
+  //     listFamilia.push(ro)
+  //   });
+  //   return this.importarService.exportarExcel(sheetName, columnHeaders, listFamilia)
+  // }
+  // async exportarPdf(): Promise<ArrayBuffer> {
+  //   const data = await this.familyRepository.findAll(100000, 0, 1)
+  //   const listFamilia = []
+  //   let contador = 0
+  //   data.registros.forEach((row) => {
+  //     const ro = [contador++, row.cod_fam, row.des_fam];
+  //     listFamilia.push(ro)
+  //   });
+  //   const columnHeaders = ['N°', 'Codigo Familia', 'Descripción Familia'];
+  //   return this.importarService.exportarPdf(listFamilia, columnHeaders, "Reporte de Familias de Productos")
+  // }
   
 }

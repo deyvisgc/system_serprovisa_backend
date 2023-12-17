@@ -10,7 +10,6 @@ export class ImportarService {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(sheetName);
     const headerRow = worksheet.addRow(columnHeaders);
-
     headerRow.eachCell((cell) => {
       cell.fill = {
         type: 'pattern',
